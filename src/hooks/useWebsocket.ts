@@ -22,7 +22,7 @@ interface UseWebSocketProps {
 export function useWebSocket({ token, privateKey, currentUserId, onNewMessage }: UseWebSocketProps) {
     const wsRef = useRef<WebSocket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
-    const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+    const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     const connect = useCallback(() => {
         if (!token) return;

@@ -13,10 +13,13 @@ export async function deriveWrappingKey(
         ['deriveKey']
     );
 
+    // Convert Uint8Array to ArrayBuffer safely
+    const saltBuffer = salt.buffer.slice(salt.byteOffset, salt.byteOffset + salt.byteLength) as ArrayBuffer;
+
     return crypto.subtle.deriveKey(
         {
             name: 'PBKDF2',
-            salt: salt,
+            salt: saltBuffer,
             iterations: 100000,
             hash: 'SHA-256',
         },

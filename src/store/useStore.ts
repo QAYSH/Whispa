@@ -38,7 +38,7 @@ export const useMessageStore = create<MessageState>((set) => ({
         set((state) => {
             const newMessages = new Map(state.messages);
             const existing = newMessages.get(userId) || [];
-            newMessages.set(userId, [message, ...existing]);
+            newMessages.set(userId, [...existing, message]);
             return { messages: newMessages };
         }),
     setMessages: (userId, messages) =>

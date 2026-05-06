@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 interface TypingIndicatorProps {
-    typers: string[];  // Array of user display names who are typing
+    typers: string[];
 }
 
 export function TypingIndicator({ typers }: TypingIndicatorProps) {
@@ -26,16 +26,16 @@ export function TypingIndicator({ typers }: TypingIndicatorProps) {
     }
 
     return (
-        <div className="px-4 py-2 border-t border-gray-100 bg-gray-50/50">
+        <div className="px-4 py-2 border-t border-[var(--border-subtle)] bg-[var(--bg-secondary)]">
             <div className="flex items-center gap-2">
                 <div className="flex gap-1">
                     <div className="typing-dot" style={{ animationDelay: '0ms' }} />
                     <div className="typing-dot" style={{ animationDelay: '150ms' }} />
                     <div className="typing-dot" style={{ animationDelay: '300ms' }} />
                 </div>
-                <span className="text-xs text-gray-500">
-          {text}{dots}
-        </span>
+                <span className="text-xs text-[var(--text-muted)]">
+                    {text}{dots}
+                </span>
             </div>
         </div>
     );

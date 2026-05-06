@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../api/auth';
-import { unwrapPrivateKey, deriveWrappingKey } from '../crypto/keyDerivation';
+import { unwrapPrivateKey, deriveWrappingKey } from '../crypto/KeyDerivation';
 import { importPublicKey } from '../crypto/rsa';
 import { useAuthStore, useCryptoStore } from '../store/useStore';
-import { Lock, Eye, EyeOff, ChevronLeft, ChevronRight, ArrowRight, Shield, Users, Globe } from 'lucide-react';
+import { Lock, Eye, EyeOff, ChevronLeft, ChevronRight, ArrowRight, Shield, Fingerprint, Zap } from 'lucide-react';
 import slide1 from '../assets/images/slide1.png';
 import slide2 from '../assets/images/slide2.png';
 import slide3 from '../assets/images/slide3.png';
@@ -13,20 +13,23 @@ const slides = [
     {
         id: 1,
         image: slide1,
-        title: "End-to-End Encrypted",
-        description: "Your messages are encrypted on your device before they ever leave. Only you and your recipient can read them.",
+        title: "Zero-Knowledge\nEncryption",
+        description: "Your messages are encrypted on your device before they leave. The server never sees plaintext.",
+        icon: <Shield className="w-5 h-5" />,
     },
     {
         id: 2,
         image: slide2,
-        title: "Private Key Stays Local",
-        description: "Your private key never leaves your device. We can't read your messages even if we wanted to.",
+        title: "Your Keys,\nYour Control",
+        description: "Private keys never leave your device. We can't read your messages — even if we wanted to.",
+        icon: <Fingerprint className="w-5 h-5" />,
     },
     {
         id: 3,
         image: slide3,
-        title: "Secure by Default",
-        description: "Every message is protected with military-grade AES-256 encryption combined with RSA-2048.",
+        title: "Military-Grade\nSecurity",
+        description: "AES-256-GCM combined with RSA-2048 ensures every message is protected by industry-leading encryption.",
+        icon: <Zap className="w-5 h-5" />,
     },
 ];
 
@@ -38,7 +41,6 @@ export function Login() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [rememberMe, setRememberMe] = useState(false);
 
     const setUser = useAuthStore((state) => state.setUser);
     const setKeys = useCryptoStore((state) => state.setKeys);
@@ -77,156 +79,149 @@ export function Login() {
 
             navigate('/chat');
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Login failed');
+            setError(err.response?.data?.detail || 'Login failed. Check your credentials.');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex bg-gray-50">
-            {/* LEFT SIDE - Image Slider with Padding */}
-            <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-gray-900 to-gray-800 p-4">
-                <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                    {/* Current Slide Image - Full Cover */}
-                    <div className="absolute inset-0 transition-opacity duration-700">
+        <div className="min-h-screen flex mesh-gradient">
+            {/* LEFT — Image Slider */}
+            <div className="hidden lg:flex lg:w-[55%] relative p-5">
+                <div className="relative w-full h-full rounded-3xl overflow-hidden">
+                    {/* Slide Image */}
+                    <div className="absolute inset-0 transition-all duration-700">
                         <img
                             src={slides[currentSlide].image}
                             alt={slides[currentSlide].title}
                             className="w-full h-full object-cover"
                         />
-                        {/* Dark Gradient Overlay for better text readability */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
                     </div>
 
-                    {/* Slide Content Overlay */}
-                    <div className="relative z-10 flex flex-col justify-between w-full h-full p-8 md:p-10">
-                        {/* Slide Counter */}
-                        <div className="flex justify-start">
-                            <div className="text-sm font-medium bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-white">
-                                {String(currentSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+                    {/* Overlay Content */}
+                    <div className="relative z-10 flex flex-col justify-between w-full h-full p-10">
+                        {/* Top — Counter + Badge */}
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10">
+                                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                                <span className="text-sm font-medium text-white/90">
+                                    {String(currentSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/10">
+                                <Lock className="w-3 h-3 text-emerald-400" />
+                                <span className="text-xs text-white/80">E2E Encrypted</span>
                             </div>
                         </div>
 
-                        {/* Slide Text Content */}
-                        <div className="space-y-4">
-                            <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-                                {slides[currentSlide].title}
-                            </h2>
-                            <p className="text-base md:text-lg text-gray-100 leading-relaxed max-w-sm">
-                                {slides[currentSlide].description}
-                            </p>
-                        </div>
+                        {/* Bottom — Content + Nav */}
+                        <div className="space-y-8">
+                            {/* Icon badge */}
+                            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white">
+                                {slides[currentSlide].icon}
+                            </div>
 
-                        {/* Navigation with Padding */}
-                        <div className="space-y-6">
-                            {/* Slide Indicators */}
-                            <div className="flex gap-2">
-                                {slides.map((_, idx) => (
+                            <div className="space-y-4">
+                                <h2 className="text-4xl font-bold text-white leading-tight whitespace-pre-line">
+                                    {slides[currentSlide].title}
+                                </h2>
+                                <p className="text-base text-white/70 leading-relaxed max-w-md">
+                                    {slides[currentSlide].description}
+                                </p>
+                            </div>
+
+                            {/* Navigation */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex gap-2">
+                                    {slides.map((_, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setCurrentSlide(idx)}
+                                            className={`h-1.5 rounded-full transition-all duration-500 ${
+                                                idx === currentSlide
+                                                    ? 'w-10 bg-white'
+                                                    : 'w-4 bg-white/25 hover:bg-white/40'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="flex gap-2">
                                     <button
-                                        key={idx}
-                                        onClick={() => setCurrentSlide(idx)}
-                                        className={`h-1 rounded-full transition-all duration-300 ${
-                                            idx === currentSlide
-                                                ? 'w-8 bg-white'
-                                                : 'w-4 bg-white/40 hover:bg-white/60'
-                                        }`}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Navigation Buttons - With proper padding from edges */}
-                            <div className="flex justify-between items-center -mx-2">
-                                <button
-                                    onClick={prevSlide}
-                                    className="p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all text-white ml-2"
-                                    aria-label="Previous slide"
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-                                <span className="text-xs text-gray-200">🔐 End-to-end encrypted</span>
-                                <button
-                                    onClick={nextSlide}
-                                    className="p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all text-white mr-2"
-                                    aria-label="Next slide"
-                                >
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
+                                        onClick={prevSlide}
+                                        className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl hover:bg-white/20 transition-all flex items-center justify-center text-white border border-white/10"
+                                    >
+                                        <ChevronLeft className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={nextSlide}
+                                        className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl hover:bg-white/20 transition-all flex items-center justify-center text-white border border-white/10"
+                                    >
+                                        <ChevronRight className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* RIGHT SIDE - White Card Form */}
-            <div className="flex-1 lg:w-1/2 flex items-center justify-center p-6 md:p-8">
-                <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 md:p-10">
-                    {/* Logo inside card - Top Left */}
-                    <div className="mb-8">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-                                <Lock className="w-4 h-4 text-white" />
+            {/* RIGHT — Login Form */}
+            <div className="flex-1 flex items-center justify-center p-6 md:p-10">
+                <div className="w-full max-w-[420px] animate-fade-in">
+                    {/* Logo */}
+                    <div className="mb-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[var(--accent-primary)] to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                                <Lock className="w-5 h-5 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900">WhisperBox</span>
+                            <div>
+                                <span className="text-xl font-bold text-[var(--text-primary)]">WhisperBox</span>
+                                <p className="text-[11px] text-[var(--text-muted)]">End-to-end encrypted</p>
+                            </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">End-to-end encrypted messaging</p>
-                    </div>
 
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
                             Welcome back
                         </h1>
-                        <p className="text-sm text-gray-500">
-                            Sign in to your secure account
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            Sign in to access your encrypted conversations
                         </p>
                     </div>
 
-                    {/* Trust Badges - Stats Row */}
-                    <div className="flex justify-between items-center gap-4 mb-8 p-4 bg-gray-50 rounded-xl">
-                        <div className="text-center">
-                            <div className="flex items-center justify-center gap-1 text-blue-600">
-                                <Shield className="w-4 h-4" />
-                                <span className="text-sm font-semibold">10k+</span>
+                    {/* Security badges */}
+                    <div className="flex gap-3 mb-8">
+                        {[
+                            { icon: <Shield className="w-4 h-4" />, label: 'AES-256', color: 'text-emerald-400' },
+                            { icon: <Fingerprint className="w-4 h-4" />, label: 'RSA-2048', color: 'text-purple-400' },
+                            { icon: <Zap className="w-4 h-4" />, label: 'Zero-Knowledge', color: 'text-cyan-400' },
+                        ].map((badge) => (
+                            <div key={badge.label} className="flex items-center gap-1.5 bg-[var(--bg-tertiary)] border border-[var(--border-subtle)] px-3 py-1.5 rounded-lg">
+                                <span className={badge.color}>{badge.icon}</span>
+                                <span className="text-[11px] font-medium text-[var(--text-secondary)]">{badge.label}</span>
                             </div>
-                            <p className="text-xs text-gray-500">Messages secured</p>
-                        </div>
-                        <div className="w-px h-8 bg-gray-200"></div>
-                        <div className="text-center">
-                            <div className="flex items-center justify-center gap-1 text-blue-600">
-                                <Globe className="w-4 h-4" />
-                                <span className="text-sm font-semibold">50+</span>
-                            </div>
-                            <p className="text-xs text-gray-500">Countries</p>
-                        </div>
-                        <div className="w-px h-8 bg-gray-200"></div>
-                        <div className="text-center">
-                            <div className="flex items-center justify-center gap-1 text-blue-600">
-                                <Users className="w-4 h-4" />
-                                <span className="text-sm font-semibold">100%</span>
-                            </div>
-                            <p className="text-xs text-gray-500">Encrypted</p>
-                        </div>
+                        ))}
                     </div>
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
                                 Username
                             </label>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+                                className="input-dark"
                                 placeholder="Enter your username"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
                                 Password
                             </label>
                             <div className="relative">
@@ -234,41 +229,22 @@ export function Login() {
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white pr-11"
+                                    className="input-dark pr-12"
                                     placeholder="Enter your password"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                 </button>
                             </div>
                         </div>
 
-                        {/* Remember Me & Forgot Password Row */}
-                        <div className="flex items-center justify-between">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm text-gray-600">Keep me signed in</span>
-                            </label>
-                            <button
-                                type="button"
-                                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                            >
-                                Forgot password?
-                            </button>
-                        </div>
-
                         {error && (
-                            <div className="bg-red-50 border border-red-100 text-red-600 p-3 rounded-xl text-sm">
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm animate-fade-in">
                                 {error}
                             </div>
                         )}
@@ -276,12 +252,12 @@ export function Login() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="btn-accent w-full flex items-center justify-center gap-2 py-3.5"
                         >
                             {isLoading ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                                    <span>Authenticating...</span>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <span>Decrypting keys...</span>
                                 </>
                             ) : (
                                 <>
@@ -293,13 +269,19 @@ export function Login() {
                     </form>
 
                     {/* Footer */}
-                    <div className="mt-8 pt-6 border-t border-gray-100 text-center">
-                        <p className="text-sm text-gray-500">
+                    <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] text-center">
+                        <p className="text-sm text-[var(--text-muted)]">
                             Don't have an account?{' '}
-                            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
+                            <Link to="/register" className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] font-semibold transition-colors">
                                 Create account
                             </Link>
                         </p>
+                    </div>
+
+                    {/* Trust note */}
+                    <div className="mt-6 flex items-center justify-center gap-2 text-[var(--text-muted)]">
+                        <Lock className="w-3 h-3" />
+                        <span className="text-[11px]">Your private key never leaves this device</span>
                     </div>
                 </div>
             </div>

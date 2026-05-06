@@ -28,7 +28,7 @@ export function MessageBubble({
             case 'delivered':
                 return <CheckCheck className="w-3 h-3" />;
             case 'read':
-                return <CheckCheck className="w-3 h-3 text-blue-300" />;
+                return <CheckCheck className="w-3 h-3 text-cyan-400" />;
             default:
                 return null;
         }
@@ -47,28 +47,25 @@ export function MessageBubble({
     return (
         <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-3 animate-fade-in`}>
             <div className={`relative max-w-[75%] ${isOwn ? 'ml-12' : 'mr-12'}`}>
-                {/* Bubble */}
-                <div className={`
-          relative px-4 py-2.5 rounded-2xl shadow-sm
-          ${isOwn
-                    ? 'bg-blue-600 text-white rounded-br-md'
-                    : 'bg-gray-100 text-gray-900 rounded-bl-md'
-                }
-        `}>
-                    <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
-                        {text}
-                    </p>
+                <div className={isOwn ? 'bubble-own' : 'bubble-other'}>
+                    <div className="px-4 py-2.5">
+                        <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                            {text}
+                        </p>
 
-                    {/* Timestamp & Status */}
-                    <div className={`flex items-center gap-1.5 mt-1 text-[10px] ${isOwn ? 'text-blue-100' : 'text-gray-400'}`}>
-                        {isEncrypted && <Lock className="w-2.5 h-2.5" />}
-                        <span>{formatDistanceToNow(new Date(timestamp), { addSuffix: true })}</span>
+                        {/* Timestamp & Status */}
+                        <div className={`flex items-center gap-1.5 mt-1.5 text-[10px] ${
+                            isOwn ? 'text-white/50' : 'text-[var(--text-muted)]'
+                        }`}>
+                            {isEncrypted && <Lock className="w-2.5 h-2.5" />}
+                            <span>{formatDistanceToNow(new Date(timestamp), { addSuffix: true })}</span>
 
-                        {isOwn && (
-                            <div className="message-status flex items-center gap-0.5 ml-0.5" title={getStatusText()}>
-                                {getStatusIcon()}
-                            </div>
-                        )}
+                            {isOwn && (
+                                <div className="flex items-center gap-0.5 ml-0.5" title={getStatusText()}>
+                                    {getStatusIcon()}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

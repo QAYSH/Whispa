@@ -1,4 +1,4 @@
-import { generateAESKey, encryptAES, decryptAES, exportAESKey, importAESKey } from './aes';
+import { generateAESKey, encryptAES, decryptAES } from './aes';
 import { encryptWithPublicKey, decryptWithPrivateKey } from './rsa';
 import type { EncryptedPayload } from '../types';
 
@@ -42,8 +42,13 @@ export async function hybridDecrypt(
         // 2. Convert from base64
         const encryptedKey = Uint8Array.from(atob(encryptedKeyBase64), c => c.charCodeAt(0));
 
-        // 3. Decrypt the AES key with recipient's private key
-        const aesKeyRaw = await decryptWithPrivateKey(encryptedKey, privateKey);
+
+// To this (convert Uint8Array to ArrayBuffer):
+        const encryptedKeyBuffer = encryptedKey.buffer.slice(
+            encryptedKey.byteOffset,
+            encryptedKey.byteOffset + encryptedKey.byteLength
+        );
+        const aesKeyRaw = await decryptWithPrivateKey(encryptedKeyBuffer, privateKey);
 
         // 4. Import the AES key
         const aesKey = await crypto.subtle.importKey(

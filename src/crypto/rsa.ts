@@ -34,10 +34,12 @@ export async function encryptWithPublicKey(
     data: Uint8Array,
     publicKey: CryptoKey
 ): Promise<ArrayBuffer> {
+    // Convert Uint8Array to ArrayBuffer safely
+    const dataBuffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
     return crypto.subtle.encrypt(
         { name: 'RSA-OAEP' },
         publicKey,
-        data
+        dataBuffer
     );
 }
 
