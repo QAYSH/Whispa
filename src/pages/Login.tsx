@@ -62,7 +62,6 @@ export function Login() {
 
         try {
             const authData = await login(username, password);
-
             const salt = Uint8Array.from(atob(authData.user.pbkdf2_salt), c => c.charCodeAt(0));
             const wrappingKey = await deriveWrappingKey(password, salt);
             const privateKey = await unwrapPrivateKey(authData.user.wrapped_private_key, wrappingKey);
@@ -76,7 +75,6 @@ export function Login() {
                 public_key: authData.user.public_key,
                 created_at: authData.user.created_at,
             });
-
             navigate('/chat');
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Login failed. Check your credentials.');
@@ -86,29 +84,29 @@ export function Login() {
     };
 
     return (
-        <div className="min-h-screen flex mesh-gradient">
-            {/* LEFT — Image Slider */}
-            <div className="hidden lg:flex lg:w-[55%] relative p-5">
+        <div className="min-h-screen flex bg-[var(--bg-primary)]">
+            {/* ═══════════════════ LEFT — Image Slider ═══════════════════ */}
+            <div className="hidden lg:block lg:w-[50%] p-5">
                 <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                    {/* Slide Image */}
+                    {/* Background Image */}
                     <div className="absolute inset-0 transition-all duration-700">
                         <img
                             src={slides[currentSlide].image}
                             alt={slides[currentSlide].title}
                             className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/25" />
                     </div>
 
                     {/* Overlay Content */}
                     <div className="relative z-10 flex flex-col justify-between w-full h-full p-10">
-                        {/* Top — Counter + Badge */}
+                        {/* Top — Logo + Badge */}
                         <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10">
-                                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                                <span className="text-sm font-medium text-white/90">
-                                    {String(currentSlide + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
-                                </span>
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-purple-600 flex items-center justify-center">
+                                    <Lock className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="text-base font-bold text-white">WhisperBox</span>
                             </div>
                             <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/10">
                                 <Lock className="w-3 h-3 text-emerald-400" />
@@ -116,23 +114,55 @@ export function Login() {
                             </div>
                         </div>
 
-                        {/* Bottom — Content + Nav */}
-                        <div className="space-y-8">
-                            {/* Icon badge */}
+                        {/* Middle — Content */}
+                        <div className="space-y-6 max-w-lg">
                             <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white">
                                 {slides[currentSlide].icon}
                             </div>
 
-                            <div className="space-y-4">
-                                <h2 className="text-4xl font-bold text-white leading-tight whitespace-pre-line">
+                            <div className="space-y-3">
+                                <h2 className="text-4xl lg:text-[44px] font-bold text-white leading-tight whitespace-pre-line">
                                     {slides[currentSlide].title}
                                 </h2>
-                                <p className="text-base text-white/70 leading-relaxed max-w-md">
+                                <p className="text-[15px] text-white/60 leading-relaxed max-w-md">
                                     {slides[currentSlide].description}
                                 </p>
                             </div>
 
-                            {/* Navigation */}
+                            {/* Testimonial */}
+                            <div className="bg-white/[0.07] backdrop-blur-xl border border-white/10 rounded-2xl p-5 max-w-md">
+                                <p className="text-sm text-white/75 italic leading-relaxed mb-4">
+                                    "WhisperBox gave me peace of mind knowing my conversations are truly private. The encryption is seamless and the UI is beautiful."
+                                </p>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-xs font-bold">
+                                        AK
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">Amara K.</p>
+                                        <p className="text-xs text-white/40">Security Engineer • Lagos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom — Stats + Nav */}
+                        <div className="space-y-6">
+                            <div className="flex gap-12">
+                                <div>
+                                    <p className="text-3xl font-bold text-white">10k+</p>
+                                    <p className="text-xs text-white/40 mt-1">Messages secured</p>
+                                </div>
+                                <div>
+                                    <p className="text-3xl font-bold text-white">50+</p>
+                                    <p className="text-xs text-white/40 mt-1">Countries</p>
+                                </div>
+                                <div>
+                                    <p className="text-3xl font-bold text-white">100%</p>
+                                    <p className="text-xs text-white/40 mt-1">Encrypted</p>
+                                </div>
+                            </div>
+
                             <div className="flex items-center justify-between">
                                 <div className="flex gap-2">
                                     {slides.map((_, idx) => (
@@ -140,24 +170,16 @@ export function Login() {
                                             key={idx}
                                             onClick={() => setCurrentSlide(idx)}
                                             className={`h-1.5 rounded-full transition-all duration-500 ${
-                                                idx === currentSlide
-                                                    ? 'w-10 bg-white'
-                                                    : 'w-4 bg-white/25 hover:bg-white/40'
+                                                idx === currentSlide ? 'w-10 bg-white' : 'w-4 bg-white/20 hover:bg-white/40'
                                             }`}
                                         />
                                     ))}
                                 </div>
                                 <div className="flex gap-2">
-                                    <button
-                                        onClick={prevSlide}
-                                        className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl hover:bg-white/20 transition-all flex items-center justify-center text-white border border-white/10"
-                                    >
+                                    <button onClick={prevSlide} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center text-white border border-white/10">
                                         <ChevronLeft className="w-4 h-4" />
                                     </button>
-                                    <button
-                                        onClick={nextSlide}
-                                        className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl hover:bg-white/20 transition-all flex items-center justify-center text-white border border-white/10"
-                                    >
+                                    <button onClick={nextSlide} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 transition-all flex items-center justify-center text-white border border-white/10">
                                         <ChevronRight className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -167,48 +189,31 @@ export function Login() {
                 </div>
             </div>
 
-            {/* RIGHT — Login Form */}
-            <div className="flex-1 flex items-center justify-center p-6 md:p-10">
+            {/* ═══════════════════ RIGHT — Login Form ═══════════════════ */}
+            <div className="flex-1 flex items-center justify-center px-6 py-10 lg:px-20">
                 <div className="w-full max-w-[420px] animate-fade-in">
                     {/* Logo */}
-                    <div className="mb-10">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[var(--accent-primary)] to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                                <Lock className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <span className="text-xl font-bold text-[var(--text-primary)]">WhisperBox</span>
-                                <p className="text-[11px] text-[var(--text-muted)]">End-to-end encrypted</p>
-                            </div>
+                    <div className="flex items-center gap-3 mb-10">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent-primary)] to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                            <Lock className="w-5 h-5 text-white" />
                         </div>
-
-                        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
-                            Welcome back
-                        </h1>
-                        <p className="text-sm text-[var(--text-secondary)]">
-                            Sign in to access your encrypted conversations
-                        </p>
-                    </div>
-
-                    {/* Security badges */}
-                    <div className="flex gap-3 mb-8">
-                        {[
-                            { icon: <Shield className="w-4 h-4" />, label: 'AES-256', color: 'text-emerald-400' },
-                            { icon: <Fingerprint className="w-4 h-4" />, label: 'RSA-2048', color: 'text-purple-400' },
-                            { icon: <Zap className="w-4 h-4" />, label: 'Zero-Knowledge', color: 'text-cyan-400' },
-                        ].map((badge) => (
-                            <div key={badge.label} className="flex items-center gap-1.5 bg-[var(--bg-tertiary)] border border-[var(--border-subtle)] px-3 py-1.5 rounded-lg">
-                                <span className={badge.color}>{badge.icon}</span>
-                                <span className="text-[11px] font-medium text-[var(--text-secondary)]">{badge.label}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                                Username
+                            <span className="text-xl font-bold text-[var(--text-primary)]">WhisperBox</span>
+                            <p className="text-xs text-[var(--text-muted)]">End-to-end encrypted</p>
+                        </div>
+                    </div>
+
+                    {/* Heading */}
+                    <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Welcome back</h1>
+                    <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-10">
+                        Sign in to access your encrypted conversations
+                    </p>
+
+                    {/* ─── Form ─── */}
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div>
+                            <label className="block text-[13px] font-medium text-[var(--text-primary)] mb-2">
+                                Username <span className="text-[var(--accent-primary)]">*</span>
                             </label>
                             <input
                                 type="text"
@@ -221,8 +226,8 @@ export function Login() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2 uppercase tracking-wider">
-                                Password
+                            <label className="block text-[13px] font-medium text-[var(--text-primary)] mb-2">
+                                Password <span className="text-[var(--accent-primary)]">*</span>
                             </label>
                             <div className="relative">
                                 <input
@@ -268,18 +273,36 @@ export function Login() {
                         </button>
                     </form>
 
-                    {/* Footer */}
-                    <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] text-center">
-                        <p className="text-sm text-[var(--text-muted)]">
-                            Don't have an account?{' '}
-                            <Link to="/register" className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] font-semibold transition-colors">
-                                Create account
-                            </Link>
-                        </p>
+                    {/* Separator */}
+                    <div className="my-8 flex items-center gap-4">
+                        <div className="flex-1 h-px bg-[var(--border-subtle)]"></div>
+                        <span className="text-xs text-[var(--text-muted)]">or</span>
+                        <div className="flex-1 h-px bg-[var(--border-subtle)]"></div>
                     </div>
 
-                    {/* Trust note */}
-                    <div className="mt-6 flex items-center justify-center gap-2 text-[var(--text-muted)]">
+                    {/* Footer */}
+                    <p className="text-center text-sm text-[var(--text-muted)]">
+                        Don't have an account?{' '}
+                        <Link to="/register" className="text-[var(--accent-primary)] hover:text-[var(--accent-primary-hover)] font-semibold transition-colors">
+                            Create account
+                        </Link>
+                    </p>
+
+                    {/* Trust badges */}
+                    <div className="mt-10 pt-8 border-t border-[var(--border-subtle)] flex items-center justify-center gap-8">
+                        {[
+                            { icon: <Shield className="w-4 h-4" />, label: 'AES-256', color: 'text-emerald-400' },
+                            { icon: <Fingerprint className="w-4 h-4" />, label: 'RSA-2048', color: 'text-purple-400' },
+                            { icon: <Zap className="w-4 h-4" />, label: 'Zero-Knowledge', color: 'text-cyan-400' },
+                        ].map((badge) => (
+                            <div key={badge.label} className="flex items-center gap-1.5">
+                                <span className={badge.color}>{badge.icon}</span>
+                                <span className="text-[11px] font-medium text-[var(--text-muted)]">{badge.label}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-center gap-2 text-[var(--text-muted)]">
                         <Lock className="w-3 h-3" />
                         <span className="text-[11px]">Your private key never leaves this device</span>
                     </div>
